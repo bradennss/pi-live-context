@@ -65,7 +65,7 @@
     "@changesets/cli": "^3.0.1",
     "@earendil-works/pi-coding-agent": "^0.85.1",
     "@eslint/js": "^10.0.1",
-    "@types/node": "^22.0.0",
+    "@types/node": "^22.19.0",
     "eslint": "^10.8.1",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
