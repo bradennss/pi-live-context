@@ -21,7 +21,7 @@ Pi discovers `AGENTS.md` and `CLAUDE.md` the same way it usually does, but sends
 
 ## Requirements
 
-- Node.js >= 20.
+- Node.js >= 22.19, the version Pi itself requires.
 - Pi 0.85 or newer.
 
 ## Development
