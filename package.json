@@ -1,0 +1,77 @@
+{
+  "name": "pi-live-context",
+  "version": "0.0.1",
+  "description": "Pi extension that reloads AGENTS.md every turn and sends it as a user message instead of system prompt text.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Braden Lamb <hi@braden.lol>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bradennss/pi-live-context.git"
+  },
+  "homepage": "https://github.com/bradennss/pi-live-context#readme",
+  "bugs": {
+    "url": "https://github.com/bradennss/pi-live-context/issues"
+  },
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-extension",
+    "pi-coding-agent",
+    "agents-md",
+    "context",
+    "system-prompt"
+  ],
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "import": "./index.ts",
+      "default": "./index.ts"
+    }
+  },
+  "files": [
+    "index.ts",
+    "src",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.32.1",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "pnpm run typecheck && pnpm run lint && pnpm run format:check && pnpm test",
+    "prepack": "pnpm run check",
+    "prepare": "husky || true"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^1.0.0",
+    "@changesets/cli": "^3.0.1",
+    "@earendil-works/pi-coding-agent": "^0.85.1",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.0.0",
+    "eslint": "^10.8.1",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "prettier": "^3.9.6",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^4.1.11"
+  }
+}

@@ -1,0 +1,28 @@
+name: Changeset Check
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  changeset:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.pull_request.labels.*.name, '@changesets/skip') }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Ensure base branch is available
+        run: git fetch origin ${{ github.base_ref }}
+      - name: Require a changeset
+        run: pnpm changeset status --since=origin/${{ github.base_ref }}
