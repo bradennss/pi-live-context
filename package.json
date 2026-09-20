@@ -1,6 +1,6 @@
 {
   "name": "pi-live-context",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Pi extension that reloads AGENTS.md every turn and sends it as a user message instead of system prompt text.",
   "type": "module",
   "license": "MIT",
