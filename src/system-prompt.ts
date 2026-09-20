@@ -1,6 +1,6 @@
 import type { ContextFile } from "./context-file.ts";
 
-/** Mirrors the `<project_context>` block `buildSystemPrompt` appends for context files. */
+/** Renders the context block used by Pi 0.85 and earlier. */
 function renderSystemPromptBlock(contextFiles: ContextFile[]): string {
   let block = "\n\n<project_context>\n\n";
   block += "Project-specific instructions and guidelines:\n\n";

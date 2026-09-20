@@ -89,12 +89,28 @@ function startEvent(
   cwd: string,
   contextFiles: { path: string; content: string }[],
   systemPrompt = systemPromptWith(contextFiles),
+  structured = true,
 ): BeforeAgentStartEvent {
+  const systemPromptOptions = {
+    selectedTools: [],
+    toolSnippets: {},
+    toolGuidelines: {},
+    promptGuidelines: [],
+    appendSystemPrompt: "",
+    sections: {},
+    cwd,
+    contextFiles,
+    skills: [],
+  };
+  if (!structured) {
+    delete (systemPromptOptions as { sections?: Record<string, string> })
+      .sections;
+  }
   return {
     type: "before_agent_start",
     prompt: "hello",
     systemPrompt,
-    systemPromptOptions: { cwd, contextFiles },
+    systemPromptOptions,
   };
 }
 
@@ -139,14 +155,20 @@ describe("liveContext", () => {
     rmSync(root, { recursive: true, force: true });
   });
 
-  it("strips the system prompt block and injects the files", () => {
+  it("removes the structured context section and injects the files", () => {
     writeFileSync(contextFile, "First rules.");
     const loaded = [{ path: contextFile, content: "First rules." }];
+    const event = startEvent(
+      cwd,
+      loaded,
+      "Pi 0.86 renders context files as a structured section.",
+    );
 
     const started = start(cwd);
-    const result = started.beforeAgentStart(startEvent(cwd, loaded));
+    const result = started.beforeAgentStart(event);
 
-    expect(result?.systemPrompt).toBe("You are a coding assistant.");
+    expect(result).toBeUndefined();
+    expect(event.systemPromptOptions.contextFiles).toEqual([]);
 
     const content = injectedContent(started.context(contextEvent()));
 
@@ -181,16 +203,32 @@ describe("liveContext", () => {
     expect(started.warnings).toEqual([]);
   });
 
-  it("warns once and keeps Pi's prompt when the block is not there", () => {
+  it("strips the rendered context block for Pi 0.85", () => {
+    writeFileSync(contextFile, "First rules.");
+    const loaded = [{ path: contextFile, content: "First rules." }];
+    const started = start(cwd);
+
+    const result = started.beforeAgentStart(
+      startEvent(cwd, loaded, systemPromptWith(loaded), false),
+    );
+
+    expect(result?.systemPrompt).toBe("You are a coding assistant.");
+    expect(injectedContent(started.context(contextEvent()))).toContain(
+      "First rules.",
+    );
+    expect(started.warnings).toEqual([]);
+  });
+
+  it("warns once when Pi 0.85's rendered block does not match", () => {
     writeFileSync(contextFile, "First rules.");
     const loaded = [{ path: contextFile, content: "Stale rules." }];
     const started = start(cwd);
 
     const first = started.beforeAgentStart(
-      startEvent(cwd, loaded, "You are a coding assistant."),
+      startEvent(cwd, loaded, "You are a coding assistant.", false),
     );
     const second = started.beforeAgentStart(
-      startEvent(cwd, loaded, "You are a coding assistant."),
+      startEvent(cwd, loaded, "You are a coding assistant.", false),
     );
 
     expect(first).toBeUndefined();
