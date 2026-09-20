@@ -4,6 +4,7 @@
  * before every request.
  */
 import {
+  type BuildSystemPromptOptions,
   type ExtensionAPI,
   type ExtensionContext,
   getAgentDir,
@@ -18,6 +19,12 @@ import { stripContextFiles } from "./src/system-prompt.ts";
 const LAYOUT_WARNING =
   "pi-live-context is off for this session: this version of Pi lays out context files in a way the extension cannot remove from the system prompt.";
 
+function supportsStructuredSystemPrompt(
+  options: BuildSystemPromptOptions,
+): boolean {
+  return "sections" in options;
+}
+
 export default function liveContext(pi: ExtensionAPI): void {
   let relocating = false;
   let warned = false;
@@ -31,10 +38,22 @@ export default function liveContext(pi: ExtensionAPI): void {
   }
 
   pi.on("before_agent_start", (event, ctx) => {
-    const contextFiles = event.systemPromptOptions.contextFiles ?? [];
+    const options = event.systemPromptOptions;
+    const contextFiles = options.contextFiles;
+    if (contextFiles.length === 0) {
+      relocating = false;
+      return;
+    }
+
+    if (supportsStructuredSystemPrompt(options)) {
+      options.contextFiles = [];
+      relocating = true;
+      return;
+    }
+
     const systemPrompt = stripContextFiles(event.systemPrompt, contextFiles);
-    relocating = contextFiles.length > 0 && systemPrompt !== event.systemPrompt;
-    if (contextFiles.length > 0 && !relocating) {
+    relocating = systemPrompt !== event.systemPrompt;
+    if (!relocating) {
       warnOnce(ctx);
     }
     return relocating ? { systemPrompt } : undefined;

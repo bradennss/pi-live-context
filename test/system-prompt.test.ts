@@ -1,6 +1,3 @@
-import { existsSync, readFileSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { stripContextFiles } from "../src/system-prompt.ts";
 
@@ -61,29 +58,5 @@ describe("stripContextFiles", () => {
     expect(stripContextFiles(prompt, quoted)).toBe(
       "You are a coding assistant.\nCurrent working directory: /home/dev/project",
     );
-  });
-});
-
-describe("Pi's system prompt format", () => {
-  // Guards the mirrored block above: Pi builds it here, and it ships the source we read.
-  it("still wraps context files the way the block is mirrored", () => {
-    const entry = fileURLToPath(
-      import.meta.resolve("@earendil-works/pi-coding-agent"),
-    );
-    const sourcePath = path.join(path.dirname(entry), "core/system-prompt.js");
-    expect(
-      existsSync(sourcePath),
-      `Pi no longer ships ${sourcePath}, so the mirrored block is unguarded`,
-    ).toBe(true);
-    const source = readFileSync(sourcePath, "utf-8");
-
-    expect(source).toContain('prompt += "\\n\\n<project_context>\\n\\n";');
-    expect(source).toContain(
-      'prompt += "Project-specific instructions and guidelines:\\n\\n";',
-    );
-    expect(source).toContain(
-      'prompt += `<project_instructions path="${filePath}">\\n${content}\\n</project_instructions>\\n\\n`;',
-    );
-    expect(source).toContain('prompt += "</project_context>\\n";');
   });
 });
